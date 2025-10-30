@@ -1,0 +1,7 @@
+flask
+mediapipe
+scikit-learn
+torch
+transformers
+gtts
+googletrans==4.0.0rc1
