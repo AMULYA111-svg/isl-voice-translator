@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ISL to Voice Translator</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+            background-color: #f0f4f8;
+        }
+        h1 {
+            color: #333;
+        }
+        #gesture-area {
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #output {
+            margin-top: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        audio {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ISL to Voice Translator</h1>
+
+    <div id="gesture-area">
+        <p>Perform your gesture in front of the webcam</p>
+        <button onclick="simulateGesture()">Simulate Gesture</button>
+        <button onclick="detectGesture()">Live Gesture Detection</button>
+    </div>
+
+    <div id="output">
+        <p><strong>English:</strong> <span id="english-text"></span></p>
+        <p><strong>Translated:</strong> <span id="translated-text"></span></p>
+        <audio id="audio-player" controls></audio>
+    </div>
+
+    <script>
+        function playAudio(audioPath) {
+            const audio = new Audio(audioPath);
+            audio.play();
+        }
+
+        function simulateGesture() {
+            fetch('/process_gesture', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gesture: [0.1, 0.2, 0.3, 0.4] }) // Simulated input
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('english-text').textContent = data.english;
+                document.getElementById('translated-text').textContent = data.translated;
+                const audioPath = '/' + data.audio;
+                document.getElementById('audio-player').src = audioPath;
+                playAudio(audioPath);
+            });
+        }
+
+        function detectGesture() {
+            fetch('/detect_gesture', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('english-text').textContent = data.english;
+                    document.getElementById('translated-text').textContent = data.translated;
+                    const audioPath = '/' + data.audio;
+                    document.getElementById('audio-player').src = audioPath;
+                    playAudio(audioPath);
+                    alert("Detected gesture: " + data.gesture);
+                });
+        }
+    </script>
+</body>
+</html>
